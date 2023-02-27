@@ -16,23 +16,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        setObservers()
+        observeViewModel()
         binding.calculate.setOnClickListener {
             viewModel.calculate(binding.number.text.toString())
         }
     }
 
-    private fun setObservers() {
-        viewModel.observeError(this) { isError ->
-            if (isError) {
+    private fun observeViewModel() {
+        viewModel.observeState(this) { state ->
+            if (state.isError) {
                 Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
             }
-        }
-        viewModel.observeProgress(this) { isProgress ->
-            binding.progress.visibility = if (isProgress) View.VISIBLE else View.GONE
-        }
-        viewModel.observeResult(this) { result ->
-            binding.result.text = result
+            binding.progress.visibility = if (state.isInProgress) View.VISIBLE else View.GONE
+            binding.result.text = state.factorial
         }
     }
 }
